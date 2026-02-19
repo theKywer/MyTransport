@@ -1,0 +1,20 @@
+services:
+
+  mytransport-db:
+    image: mysql:latest
+    container_name: MyTransportDB
+    restart: unless-stopped
+    volumes:
+      - ../../db:/var/lib/mysql
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./sql:/docker-entrypoint-initdb.d/sql
+    ports:
+      - "${MYSQL_HOST_PORT}:3306"
+    environment:
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+    networks:
+      - MyTransportNetwork
+
+networks:
+  MyTransportNetwork:
+    external: true

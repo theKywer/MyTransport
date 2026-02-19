@@ -1,0 +1,15 @@
+# bin/curl-json
+#!/bin/bash
+
+# Выполняем curl с добавлением статуса в конец
+output=$(curl -s -w "STATUS:%{http_code}" "$@")
+
+# Извлекаем тело и статус
+body=${output%STATUS:*}
+status=${output#*STATUS:}
+
+# Выводим тело через jq (если JSON) или как есть
+echo "$body" | jq -R "try fromjson catch ." --color-output 2>/dev/null || echo "$body"
+
+# Выводим статус
+echo "HTTP Status: $status"
