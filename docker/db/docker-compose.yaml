@@ -5,6 +5,7 @@ services:
     container_name: MyTransportDB
     restart: unless-stopped
     volumes:
+      # host path changed to top‑level db directory (relative to this compose file)
       - ../../db:/var/lib/mysql
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql
       - ./sql:/docker-entrypoint-initdb.d/sql
@@ -14,6 +15,9 @@ services:
       - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
     networks:
       - MyTransportNetwork
+
+volumes:
+  mytransport-mysql-data:
 
 networks:
   MyTransportNetwork:

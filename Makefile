@@ -28,6 +28,10 @@ SYMFONY_SQL_INIT := docker/symfony/db/init.sql
 # =============================================================================
 # 🐳 DOCKER COMPOSE КОМАНДЫ
 # =============================================================================
+
+# подгружаем переменные из файла среды, чтобы Makefile их видел
+-include docker/db/.env
+
 DOCKER_COMPOSE_LARA   := docker compose -f docker/laravel/docker-compose.yaml
 DOCKER_COMPOSE_YII    := docker compose -f docker/yii/docker-compose.yaml
 DOCKER_COMPOSE_SYMFONY:= docker compose -f docker/symfony/docker-compose.yaml
@@ -131,7 +135,7 @@ up-network:
 init: up-db init-lara init-yii init-symfony
 	@echo -e "$(GREEN)✅ Все проекты инициализированы!$(RESET)"
 
-init-lara: lara-clone lara-fix-permissions lara-run-sql up-lara lara-composer-install lara-key-generate lara-migrate
+init-lara: lara-fix-permissions lara-run-sql up-lara lara-composer-install lara-key-generate lara-migrate
 
 init-yii: up-db
 	@if [ ! -d "$(YII_DIR)" ]; then \
@@ -151,8 +155,14 @@ init-symfony: symfony-clone symfony-fix-permissions symfony-run-sql up-symfony s
 .PHONY: run-sql
 
 run-sql:
+	@if [ -z "$(SQL_SCRIPT)" ]; then \
+		echo -e "$(YELLOW)⚠️  Не указан SQL_SCRIPT"; \
+		exit 1; \
+	fi
 	@echo -e "$(BLUE)🔥 Выполняем SQL-скрипт: $(SQL_SCRIPT)$(RESET)"
-	docker exec -i MyTransportDB env MYSQL_PWD=wasd123 mysql -uadmin_db -hlocalhost < "$(SQL_SCRIPT)" || \
+	# используем пользователя admin_db, он теперь создаётся в init.sql
+	# используем root, пароль берём из файла docker/db/.env (подгружается ранее)
+	docker exec -i MyTransportDB env MYSQL_PWD=${MYSQL_ROOT_PASSWORD} mysql -uroot -hlocalhost < "$(SQL_SCRIPT)" || \
 		(echo -e "$(YELLOW)❌ Ошибка выполнения SQL$(RESET)" && exit 1)
 
 # =============================================================================
@@ -271,6 +281,10 @@ lara-fix-permissions:
 	sudo chown -R $$(id -u):www-data $(LARAVEL_DIR)/storage $(LARAVEL_DIR)/bootstrap/cache
 	sudo chmod -R 775 $(LARAVEL_DIR)/storage $(LARAVEL_DIR)/bootstrap/cache
 	@echo -e "$(GREEN)✅ Права исправлены$(RESET)"
+
+lara-terminal:
+	@echo -e "$(BLUE)🖥️ Открываю консоль Laravel...$(RESET)"
+	$(DOCKER_COMPOSE_LARA) exec laravel-php bash
 
 # =============================================================================
 # 🧰 YII: УПРАВЛЕНИЕ

@@ -1,6 +1,7 @@
 /db
 docker/db/.env
 docker/db/init.sql
+docker/db/db/
 docker/laravel/.env
 docker/yii/.env
 vendor/
