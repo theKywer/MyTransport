@@ -5,3 +5,4 @@ docker/db/db/
 docker/laravel/.env
 docker/yii/.env
 vendor/
+calculator_capilot.php
