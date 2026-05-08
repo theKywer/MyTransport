@@ -15,13 +15,13 @@ CREATE DATABASE IF NOT EXISTS `laravel`
 -- =======================================================
 -- Пользователь
 -- =======================================================
-CREATE USER IF NOT EXISTS 'your_user'@'%' IDENTIFIED BY 'your_password';
+CREATE USER IF NOT EXISTS 'kywer'@'%' IDENTIFIED BY '123123';
 
 -- Права на Yii
-GRANT ALL PRIVILEGES ON yii.* TO 'your_user'@'%';
+GRANT ALL PRIVILEGES ON yii.* TO 'kywer'@'%';
 
 -- Права на Laravel
-GRANT ALL PRIVILEGES ON laravel.* TO 'your_user'@'%';
+GRANT ALL PRIVILEGES ON laravel.* TO 'kywer'@'%';
 
 -- Применяем
 FLUSH PRIVILEGES;
